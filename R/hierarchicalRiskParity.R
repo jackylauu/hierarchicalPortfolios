@@ -111,6 +111,15 @@ hierarchicalRiskParity <- function(asset_prices=NULL, asset_returns=NULL,
   if(is.null(w_max))
     w_max = rep(1, ncol(Sigma))
 
+  if(!is.vector(w_min) | length(w_min)==1)
+    w_min <- rep(w_min, ncol(Sigma))
+
+  if(!is.vector(w_max) | length(w_max)==1)
+    w_max <- rep(w_max, ncol(Sigma))
+
+  if(sum(w_min>1))
+    stop("Invalid minimum weights.")
+
   w <- getRecBipart(Sigma, sorted_idx, w_min, w_max, lam)
 
   return(list('w'=w))
