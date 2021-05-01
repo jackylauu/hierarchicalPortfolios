@@ -9,7 +9,7 @@ hierarchicalEqualRiskContribution(
   asset_returns = NULL,
   Sigma = NULL,
   risk_measure = c("variance", "standard-deviation", "equal-weighting", "CVaR", "CDaR"),
-  linkage = "ward.D2",
+  method = "ward.D2",
   num_clusters = NULL
 )
 }
@@ -25,8 +25,11 @@ covariance matrix will be computed from the returns.}
 portfolio weights. Must be one of c('variance', 'standard-deviation',
 'equal-weighting', 'CVaR', 'CDaR')}
 
-\item{linkage}{String indicating the desired linkage function. Must be one
-of c("single", "complete","average" ,"ward.D", "ward.D2" )}
+\item{method}{String indicating the desired hierarchical clustering method.
+Must be one of c("single", "complete", "average" ,"ward.D", "ward.D2",
+"divisive"). If method="divisive", divisive clustering (or the DIANA
+algorithm)is used, otherwise agglomerative clustering is used with
+method referring to the desired linkage function.}
 
 \item{num_clusters}{Integer value representing the optimal number of clusters.
 If no value is given, the optimal number of clusters will be computed

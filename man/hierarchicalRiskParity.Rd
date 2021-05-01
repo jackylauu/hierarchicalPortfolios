@@ -8,7 +8,10 @@ hierarchicalRiskParity(
   asset_prices = NULL,
   asset_returns = NULL,
   Sigma = NULL,
-  linkage = "single"
+  method = "single",
+  w_min = NULL,
+  w_max = NULL,
+  lam = 1
 )
 }
 \arguments{
@@ -19,8 +22,20 @@ hierarchicalRiskParity(
 \item{Sigma}{Covariance matrix of returns. If none is provided, the
 covariance matrix will be computed from the returns.}
 
-\item{linkage}{String indicating the desired linkage function. Must be one
-of c("single", "complete","average" ,"ward.D", "ward.D2" )}
+\item{method}{String indicating the desired hierarchical clustering method.
+Must be one of c("single", "complete", "average" ,"ward.D", "ward.D2",
+"divisive"). If method="divisive", divisive clustering (or the DIANA
+algorithm)is used, otherwise agglomerative clustering is used with
+method referring to the desired linkage function.}
+
+\item{w_min}{Scalar or vector with values between \link{0,1} to control the
+minimum value of weights.}
+
+\item{w_max}{Scalar or vector with values between \link{0,1} to control the
+maximum value of weights.}
+
+\item{lam}{Non-negative tuning parameter to control the concentration into
+different clusters.}
 }
 \description{
 This function designs a hierarchical risk parity portfolio

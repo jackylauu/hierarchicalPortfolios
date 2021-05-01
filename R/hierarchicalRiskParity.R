@@ -23,7 +23,7 @@ bisectClusters <- function(clusters){
   return(clusters_new)
 }
 
-getRecBipart <- function(Sigma, sorted_idx) {
+getRecBipart <- function(Sigma, sorted_idx, w_min, w_max, lam) {
   N <- length(sorted_idx)
   w <- rep(1., N)
   clusters <- bisectClusters(list(sorted_idx))
@@ -35,9 +35,18 @@ getRecBipart <- function(Sigma, sorted_idx) {
       cl0 <- unlist(clusters[i])
       cl1 <- unlist(clusters[i+1])
 
-      cl_var0 <- getClusterVar(Sigma, cl0)
+      cl_var0 <- lam * getClusterVar(Sigma, cl0)
       cl_var1 <- getClusterVar(Sigma, cl1)
       alpha <- 1 - cl_var0 / (cl_var0 + cl_var1)
+
+      alpha <- min(sum(w_max[cl0]) / w[cl0[1]],
+                   max(sum(w_min[cl0]) / w[cl0[1]],
+                       alpha))
+
+      alpha <- 1- min(sum(w_max[cl1]) / w[cl1[1]],
+                   max(sum(w_min[cl1]) / w[cl1[1]],
+                       1-alpha))
+
       w[cl0] <- w[cl0] * alpha
       w[cl1] <- w[cl1] * (1-alpha)
     }
@@ -63,25 +72,46 @@ getRecBipart <- function(Sigma, sorted_idx) {
 #' @param asset_returns An XTS object of the asset returns. 
 #' @param Sigma Covariance matrix of returns. If none is provided, the
 #'        covariance matrix will be computed from the returns.
-#' @param linkage String indicating the desired linkage function. Must be one
-#'        of c("single", "complete","average" ,"ward.D", "ward.D2" )
+#' @param method String indicating the desired hierarchical clustering method.
+#'        Must be one of c("single", "complete", "average" ,"ward.D", "ward.D2",
+#'        "divisive"). If method="divisive", divisive clustering (or the DIANA
+#'        algorithm)is used, otherwise agglomerative clustering is used with
+#'        method referring to the desired linkage function.
+#' @param w_min Scalar or vector with values between [0,1] to control the
+#'        minimum value of weights.
+#' @param w_max Scalar or vector with values between [0,1] to control the
+#'        maximum value of weights.
+#' @param lam Non-negative tuning parameter to control the concentration into 
+#'        different clusters.
 #'
 #' @export
 hierarchicalRiskParity <- function(asset_prices=NULL, asset_returns=NULL,
-                                   Sigma=NULL, linkage='single') {
+                                   Sigma=NULL, method='single', w_min=NULL,
+                                   w_max=NULL, lam=1) {
   if(is.null(Sigma) && is.null(asset_prices) && is.null(asset_returns))
     stop("Invalid input. Please provide either a covariance matrix, asset returns or asset prices.")
   if(is.null(asset_returns))
-    asset_returns <- diff(log(asset_prices))[-1]
+    asset_returns <- PerformanceAnalytics::Return.calculate(asset_prices,
+                                                            method='arithmetic')[-1]
   if(is.null(Sigma))
     Sigma <- cov(asset_returns)
   rho <- cov2cor(Sigma)
   distance <- as.dist(sqrt((1-rho)/2))
 
-  hcluster <- hclust(distance, method=linkage)
+  if(method=='divisive'){
+    hcluster <- cluster::diana(distance)
+  }else{
+    hcluster <- hclust(distance, method=method)
+  }
+
   sorted_idx <- hcluster$order
 
-  w <- getRecBipart(Sigma, sorted_idx)
+  if(is.null(w_min))
+    w_min = rep(0, ncol(Sigma))
+  if(is.null(w_max))
+    w_max = rep(1, ncol(Sigma))
+
+  w <- getRecBipart(Sigma, sorted_idx, w_min, w_max, lam)
 
   return(list('w'=w))
 }

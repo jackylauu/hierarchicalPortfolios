@@ -9,7 +9,7 @@ computeClusterInertia <- function(labels, asset_returns) {
   return(log(inertia))
 } 
 
-computeExpectedInertia <- function(N, D, num_clusters, linkage,
+computeExpectedInertia <- function(N, D, num_clusters, method,
                                    num_reference_datasets=5) {
   reference_inertia <- 0
   for(i in 1:num_reference_datasets){
@@ -17,8 +17,13 @@ computeExpectedInertia <- function(N, D, num_clusters, linkage,
     reference_corr <- cor(reference_asset_returns)
     reference_dist <- as.dist(sqrt(2 * (1 - reference_corr)))
 
-    reference_cluster_assignments <- dendextend::cutree(hclust(reference_dist,
-                                                               method=linkage),
+    if(method=='divisive'){
+      reference_clust <- cluster::diana(reference_dist)
+    }else{
+      reference_clust<- hclust(reference_dist, method=method)
+    }
+
+    reference_cluster_assignments <- dendextend::cutree(reference_clust,
                                                         k=num_clusters,
                                                         order_clusters_as_data=F)
 
@@ -29,13 +34,18 @@ computeExpectedInertia <- function(N, D, num_clusters, linkage,
   return(reference_inertia/num_reference_datasets)
 }
 
-computeNumClusters <- function(rho, linkage, asset_returns, distance) {
+computeNumClusters <- function(rho, method, asset_returns, distance) {
   gap_values <- list()
   num_clusters <- 1
   max_clusters <- -Inf
   N <- ncol(asset_returns)
   D <- nrow(asset_returns)
-  original_clusters <- hclust(distance, method=linkage)
+
+  if(method=='divisive'){
+    original_clusters <- cluster::diana(distance)
+  }else{
+    original_clusters <- hclust(distance, method=method)
+  }
 
   for(i in 1:nrow(rho)){
     original_cluster_assignments <- dendextend::cutree(original_clusters,
@@ -48,7 +58,7 @@ computeNumClusters <- function(rho, linkage, asset_returns, distance) {
     }
     max_clusters = max(original_cluster_assignments)
     inertia <- computeClusterInertia(original_cluster_assignments, asset_returns)
-    expected_inertia <- computeExpectedInertia(N, D, num_clusters, linkage)
+    expected_inertia <- computeExpectedInertia(N, D, num_clusters, method)
 
     gap_values <- c(gap_values, expected_inertia - inertia)
     num_clusters <- num_clusters + 1
@@ -246,8 +256,11 @@ getPortfolioWeights <- function(hcluster, asset_returns, Sigma, num_clusters,
 #' @param risk_measure String indicating the desired risk measure for assigning
 #'        portfolio weights. Must be one of c('variance', 'standard-deviation',
 #'        'equal-weighting', 'CVaR', 'CDaR') 
-#' @param linkage String indicating the desired linkage function. Must be one
-#'        of c("single", "complete","average" ,"ward.D", "ward.D2" )
+#' @param method String indicating the desired hierarchical clustering method.
+#'        Must be one of c("single", "complete", "average" ,"ward.D", "ward.D2",
+#'        "divisive"). If method="divisive", divisive clustering (or the DIANA
+#'        algorithm)is used, otherwise agglomerative clustering is used with
+#'        method referring to the desired linkage function.
 #' @param num_clusters Integer value representing the optimal number of clusters.
 #'        If no value is given, the optimal number of clusters will be computed 
 #'        automatically.
@@ -259,7 +272,7 @@ hierarchicalEqualRiskContribution <- function(asset_prices=NULL,
                                                              'standard-deviation', 
                                                              'equal-weighting',
                                                              'CVaR', 'CDaR'), 
-                                              linkage='ward.D2', num_clusters=NULL) {
+                                              method='ward.D2', num_clusters=NULL) {
 
   risk_measure <- match.arg(risk_measure)
   if(is.null(asset_prices) && is.null(asset_returns))
@@ -271,9 +284,14 @@ hierarchicalEqualRiskContribution <- function(asset_prices=NULL,
   rho <- cov2cor(Sigma)
   distance <- as.dist(sqrt(2 * (1-rho)))
 
-  hcluster <- hclust(distance, method=linkage)
+  if(method=='divisive'){
+    hcluster <- cluster::diana(distance)
+  }else{
+    hcluster <- hclust(distance, method=method)
+  }
+
   if(is.null(num_clusters))
-    num_clusters <- computeNumClusters(rho, linkage, asset_returns, distance)
+    num_clusters <- computeNumClusters(rho, method, asset_returns, distance)
 
   cluster_assignments <- dendextend::cutree(hcluster, k=num_clusters, order_clusters_as_data=F)
   asset_names <- names(asset_prices)

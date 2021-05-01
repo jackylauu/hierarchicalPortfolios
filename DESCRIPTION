@@ -12,13 +12,13 @@ Authors@R:
     person(given = "Jacky",
            family = "Lau",
            role = c("aut", "cre"),
-           email = "jzlau@connect.ust.hk",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "jzlau@connect.ust.hk")
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
     PerformanceAnalytics,
-    dendextend
+    dendextend,
+    cluster
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
