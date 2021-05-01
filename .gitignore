@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+
+inst/doc
+README_cache
+*.aux
+*.log
+*.tar.gz
