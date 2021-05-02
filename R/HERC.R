@@ -266,13 +266,10 @@ getPortfolioWeights <- function(hcluster, asset_returns, Sigma, num_clusters,
 #'        automatically.
 #'
 #' @export
-hierarchicalEqualRiskContribution <- function(asset_prices=NULL,
-                                              asset_returns=NULL, Sigma=NULL,
-                                              risk_measure=c('variance', 
-                                                             'standard-deviation', 
-                                                             'equal-weighting',
-                                                             'CVaR', 'CDaR'), 
-                                              method='ward.D2', num_clusters=NULL) {
+HERC <- function(asset_prices=NULL, asset_returns=NULL, Sigma=NULL,
+                 risk_measure=c('variance', 'standard-deviation',
+                                'equal-weighting', 'CVaR', 'CDaR'),
+                 method='ward.D2', num_clusters=NULL) {
 
   risk_measure <- match.arg(risk_measure)
   if(is.null(asset_prices) && is.null(asset_returns))

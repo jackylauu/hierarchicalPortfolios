@@ -85,7 +85,7 @@ getRecBipart <- function(Sigma, sorted_idx, w_min, w_max, lam) {
 #'        different clusters.
 #'
 #' @export
-hierarchicalRiskParity <- function(asset_prices=NULL, asset_returns=NULL,
+HRP <- function(asset_prices=NULL, asset_returns=NULL,
                                    Sigma=NULL, method='single', w_min=NULL,
                                    w_max=NULL, lam=1) {
   if(is.null(Sigma) && is.null(asset_prices) && is.null(asset_returns))
