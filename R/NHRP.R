@@ -153,7 +153,7 @@ getRecursiveBisection <- function(dend, Sigma, asset_returns,
 NHRP <- function(asset_prices=NULL, asset_returns=NULL, Sigma=NULL,
                      risk_measure=c('variance', 'standard-deviation',
                                     'CVaR', 'CDaR'),
-                     method='ward.D2', w_min=NULL, w_max=NULL, lam=1) {
+                     method='complete', w_min=NULL, w_max=NULL, lam=1) {
   risk_measure <- match.arg(risk_measure)
   if(is.null(asset_prices) && is.null(asset_returns))
     stop("Asset prices and returns not given.")
