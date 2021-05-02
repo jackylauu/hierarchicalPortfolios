@@ -63,10 +63,10 @@ getRecBipart <- function(Sigma, sorted_idx, w_min, w_max, lam) {
 #' based on Lopez de Prado's paper "Building Diversified Portfolios that
 #' Outperform Out-of-Sample" (2015).
 #' 
-#' @details This portfolio allocation method is a heuristic method which makes
-#' use of hierarchical clustering to seriate the correlation matrix of asset
-#' returns, then recursively allocates the portfolio weights via naive risk
-#' parity and "recursive bisection".
+#' @details This portfolio allocation method utilizes hierarchical clustering
+#' to seriate the correlation matrix of asset returns, then recursively
+#' allocates the portfolio weights via naive risk parity and "recursive
+#' bisection".
 #'
 #' @param asset_prices An XTS object of the asset prices.
 #' @param asset_returns An XTS object of the asset returns. 

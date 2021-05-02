@@ -155,7 +155,7 @@ calculateClusterRiskContribution <- function(risk_measure, Sigma, asset_returns,
   return(cluster_contributions)
 }
 
-getRecursiveBisection <- function(dend, cluster_contributions, risk_measure){
+getRecursiveBisectionHERC <- function(dend, cluster_contributions, risk_measure){
   num_clusters <- nobs(dend)
   weights <- rep(1,num_clusters)
 
@@ -231,7 +231,7 @@ getPortfolioWeights <- function(hcluster, asset_returns, Sigma, num_clusters,
   dend_depth <- hcluster$height[N - num_clusters]
   clusters_dend <- cut(as.dendrogram(hcluster), h=dend_depth)$upper
 
-  clusters_weights <- getRecursiveBisection(clusters_dend, cluster_contributions, risk_measure)
+  clusters_weights <- getRecursiveBisectionHERC(clusters_dend, cluster_contributions, risk_measure)
 
   w <- calculateFinalPortfolioWeights(risk_measure, clusters_weights, Sigma, 
                                       asset_returns, num_clusters, cluster_assignments)
@@ -246,8 +246,8 @@ getPortfolioWeights <- function(hcluster, asset_returns, Sigma, num_clusters,
 #' @description This function designs hierarchical equal risk contribution
 #'              portfolios based on the method proposed by Raffinot (2018).
 #'
-#' @details This portfolio allocation method makes use of hierarchical clustering
-#'          to assign portfolio weights.
+#' @details This portfolio allocation method makes use of hierarchical
+#' clustering to assign portfolio weights.
 #'
 #' @param asset_prices An XTS object of the asset prices.
 #' @param asset_returns An XTS object of the asset returns. 
