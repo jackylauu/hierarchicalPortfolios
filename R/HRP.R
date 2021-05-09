@@ -122,5 +122,5 @@ HRP <- function(asset_prices=NULL, asset_returns=NULL,
 
   w <- getRecBipart(Sigma, sorted_idx, w_min, w_max, lam)
 
-  return(list('w'=w))
+  return(list('w'=w, 'tree'=hcluster))
 }

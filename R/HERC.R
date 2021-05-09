@@ -297,6 +297,6 @@ HERC <- function(asset_prices=NULL, asset_returns=NULL, Sigma=NULL,
   w <- getPortfolioWeights(hcluster, asset_returns, Sigma, num_clusters,
                            risk_measure, cluster_assignments)
 
-  return(list('w'=w))
+  return(list('w'=w, 'tree'=hcluster))
 }
 

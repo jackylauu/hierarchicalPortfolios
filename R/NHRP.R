@@ -185,5 +185,5 @@ NHRP <- function(asset_prices=NULL, asset_returns=NULL, Sigma=NULL,
   w <- getRecursiveBisection(as.dendrogram(hcluster), Sigma, asset_returns,
                              risk_measure, w_min, w_max, lam)
 
-  return(list('w'=w))
+  return(list('w'=w, 'tree'=hcluster))
 }

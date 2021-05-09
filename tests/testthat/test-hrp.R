@@ -4,6 +4,7 @@ data(prices)
 test_that("regular HRP", {
     portfolio <- HRP(prices)
     expect_true(sum(portfolio$w) == 1)
+    expect_true(class(portfolio$tree) == 'hclust')
 })
 
 test_that("HRP with weight constraints", {
